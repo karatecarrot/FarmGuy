@@ -215,7 +215,7 @@ public class WorldData : MonoBehaviour
         /* BASIC TERRAIN */
 
         // Converts a 0 to 1 value into a percentage that gets multiplied by the heignt to create terrain
-        int terrainHeight = Mathf.FloorToInt(biomeData.terrainHeight * Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biomeData.terrainScale)) + biomeData.solidGroundHeight;
+        int terrainHeight = Mathf.FloorToInt(biomeData.terrainHeight * Noise.Get2DPerlin(new Vector2(pos.x + seed, pos.z + seed), 0, biomeData.terrainScale)) + biomeData.solidGroundHeight;
 
         byte voxelValue = 0;
 
