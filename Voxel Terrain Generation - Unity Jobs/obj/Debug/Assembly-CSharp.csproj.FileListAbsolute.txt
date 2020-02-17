@@ -337,3 +337,6 @@ C:\Users\Family PC\Desktop\Farming Guy\Voxel Terrain Generation\Voxel Terrain Ge
 C:\Users\Family PC\Desktop\Farming Guy\Voxel Terrain Generation\Voxel Terrain Generation - Unity Jobs\obj\Debug\Assembly-CSharp.csproj.CopyComplete
 C:\Users\Family PC\Desktop\Farming Guy\Voxel Terrain Generation\Voxel Terrain Generation - Unity Jobs\obj\Debug\Assembly-CSharp.dll
 C:\Users\Family PC\Desktop\Farming Guy\Voxel Terrain Generation\Voxel Terrain Generation - Unity Jobs\obj\Debug\Assembly-CSharp.pdb
+D:\Farm Guy\Voxel Terrain Generation - Unity Jobs\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+D:\Farm Guy\Voxel Terrain Generation - Unity Jobs\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
+D:\Farm Guy\Voxel Terrain Generation - Unity Jobs\obj\Debug\Assembly-CSharp.dll

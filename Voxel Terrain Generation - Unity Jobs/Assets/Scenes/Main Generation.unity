@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53d737bd2edb6bb4e822eca5b5aa45ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 2147483647
+  seed: 100
   biomeData: {fileID: 11400000, guid: c687d27cdc4b5d64ba6b5e0a058b032b, type: 2}
   player: {fileID: 2120812001}
   spawnLocation: {x: 0, y: 0, z: 0}
@@ -835,11 +835,11 @@ MonoBehaviour:
   mainCamera: {fileID: 390852032}
   invertLookX: 0
   invertLookY: 0
-  mouseSensitivity: {x: 1, y: 1}
+  mouseSensitivity: {x: 2, y: 2}
   isGrounded: 0
   isSprinting: 0
   walkSpeed: 3
   sprintSpeed: 6
-  jumpForce: 5
+  jumpForce: 4
   playerWidth: 0.15
   boundsTolerance: 0.1
