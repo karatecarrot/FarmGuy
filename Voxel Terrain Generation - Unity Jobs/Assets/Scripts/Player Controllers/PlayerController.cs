@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private Transform mainCamera;
-    [SerializeField] private bool invertLookX, invertLookY = false;
-    [SerializeField] private Vector2 mouseSensitivity = Vector2.one;
-    private WorldData worldData;
+    public Transform mainCamera;
+    public GameObject debugScreen;
+    public bool invertLookX, invertLookY = false;
+    private BlockDatabase blockDatabase;
+    private WorldGenerator worldGenerator;
+    private GameManager gameManager;
     [Space]
     public bool isGrounded;
     public bool isSprinting;
@@ -15,11 +17,12 @@ public class PlayerController : MonoBehaviour
     public float walkSpeed = 3f;
     public float sprintSpeed = 6f;
     public float jumpForce = 5f;
-    private const float gravity = -9.8f;
+    private const float gravity = -12;
+    // -57.46 m/s
+    // -70 m/s
 
     // Diamiter of the player capsule
     public float playerWidth = 0.15f;
-    public float boundsTolerance = 0.1f;
 
     private float horizontal;
     private float vertical;
@@ -29,26 +32,38 @@ public class PlayerController : MonoBehaviour
     private float verticalMomentum = 0;
     private bool jumpRequest;
 
+    public Transform highlightedBlock;
+    public float checkIncrament = 0.25f;
+    public float playerReach = 8;
+
+    public byte selectedBlockIndex = 1;
+
     public Vector3 Position
     {
         get { return transform.position; }
         set { transform.position = value; }
     }
 
-    public void SpawnPlayer(Vector3 positionToSpawn, WorldData _WorldData)
+    public void SpawnPlayer(Vector3 positionToSpawn, BlockDatabase database, WorldGenerator world, GameManager manager)
     {
-        worldData = _WorldData;
+        blockDatabase = database;
+        worldGenerator = world;
+        gameManager = manager;
         Position = positionToSpawn;
 
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void GetPlayerInputs()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
-        mouseHorizontal = Input.GetAxis("Mouse X") * mouseSensitivity.x;
-        mouseVertical = Input.GetAxis("Mouse Y") * mouseSensitivity.y;
+        mouseHorizontal = Input.GetAxisRaw("Mouse X") * gameManager.settings.mouseSensitivity;
+        mouseVertical = Input.GetAxisRaw("Mouse Y") * gameManager.settings.mouseSensitivity;
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
             isSprinting = true;
@@ -58,22 +73,80 @@ public class PlayerController : MonoBehaviour
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
             jumpRequest = true;
 
+        if (Input.GetKeyDown(KeyCode.F3))
+            debugScreen.SetActive(!debugScreen.activeSelf);
+
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+
+        if(scroll != 0)
+        {
+            if (scroll > 0)
+                selectedBlockIndex++;
+            else
+                selectedBlockIndex--;
+
+            if (selectedBlockIndex > (byte)(blockDatabase.blockDatabase.Count - 1))
+                selectedBlockIndex = 1;
+            else if (selectedBlockIndex < 1)
+                selectedBlockIndex = (byte)(blockDatabase.blockDatabase.Count - 1);
+        }
+
+        if (highlightedBlock.gameObject.activeSelf)
+        {
+            // Destroy Block
+            if (Input.GetMouseButtonDown(0))
+            {
+                worldGenerator.GetChunkFromVector3(highlightedBlock.position).EditVoxel(highlightedBlock.position, 0);
+            }
+            // Place Block
+            if (Input.GetMouseButtonDown(1))
+                worldGenerator.GetChunkFromVector3(highlightedBlock.position).EditVoxel(highlightedBlock.position, selectedBlockIndex);
+        }
+    }
+
+    /// <summary>
+    /// Create a loop, like a raycast but custom. Casts forward every <see cref="checkIncrament"/> to see if a block is in that place, if a block is there then place a new block in the direction of the last pos. 
+    /// </summary>
+    private void PlaceCursorBlock()
+    {
+        float step = checkIncrament;
+
+        while (step < playerReach)
+        {
+            Vector3 position = mainCamera.position + (mainCamera.forward * step);
+
+            if(worldGenerator.CheckForVoxel(position))
+            {
+                highlightedBlock.position = new Vector3(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y), Mathf.FloorToInt(position.z));
+
+                highlightedBlock.gameObject.SetActive(true);
+
+                return;
+            }
+
+            step += checkIncrament;
+        }
+
+        highlightedBlock.gameObject.SetActive(false);
     }
 
     private void FixedUpdate()
     {
+        PlaceCursorBlock();
+
         CalculateVelocity();
         if (jumpRequest)
             Jump();
 
-        transform.Rotate(Vector3.up * GetMouseHorizontal);
-        mainCamera.Rotate(Vector3.right * GetMouseVertical);
         transform.Translate(velocity, Space.World);
     }
 
     private void Update()
     {
         GetPlayerInputs();
+
+        transform.Rotate(Vector3.up * GetMouseHorizontal);
+        mainCamera.Rotate(Vector3.right * GetMouseVertical);
     }
 
 
@@ -117,10 +190,10 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     private float CheckDownSpeed(float downSpeed)
     {
-        if (worldData.CheckForVoxelInSpace(new Vector3(Position.x - playerWidth, Position.y + downSpeed, Position.z - playerWidth)) ||
-            worldData.CheckForVoxelInSpace(new Vector3(Position.x + playerWidth, Position.y + downSpeed, Position.z - playerWidth)) ||
-            worldData.CheckForVoxelInSpace(new Vector3(Position.x + playerWidth, Position.y + downSpeed, Position.z + playerWidth)) ||
-            worldData.CheckForVoxelInSpace(new Vector3(Position.x - playerWidth, Position.y + downSpeed, Position.z - playerWidth)))
+        if (worldGenerator.CheckForVoxel(new Vector3Int((int)(Position.x - playerWidth), (int)(Position.y + downSpeed), (int)(Position.z - playerWidth))) ||
+            worldGenerator.CheckForVoxel(new Vector3Int((int)(Position.x + playerWidth), (int)(Position.y + downSpeed), (int)(Position.z - playerWidth))) ||
+            worldGenerator.CheckForVoxel(new Vector3Int((int)(Position.x + playerWidth), (int)(Position.y + downSpeed), (int)(Position.z + playerWidth))) ||
+            worldGenerator.CheckForVoxel(new Vector3Int((int)(Position.x - playerWidth), (int)(Position.y + downSpeed), (int)(Position.z - playerWidth))))
         {
             isGrounded = true;
             return 0;
@@ -131,7 +204,7 @@ public class PlayerController : MonoBehaviour
             return downSpeed;
         }
     }
-
+    
     /// <summary>
     /// Calculates if the player is currently jumping up at (<paramref name="upSpeed"/>).
     /// </summary>
@@ -139,10 +212,10 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     private float CheckUpSpeed(float upSpeed)
     {
-        if (worldData.CheckForVoxelInSpace(new Vector3(Position.x - playerWidth, Position.y + 2f + upSpeed, Position.z - playerWidth)) ||
-            worldData.CheckForVoxelInSpace(new Vector3(Position.x + playerWidth, Position.y + 2f + upSpeed, Position.z - playerWidth)) ||
-            worldData.CheckForVoxelInSpace(new Vector3(Position.x + playerWidth, Position.y + 2f + upSpeed, Position.z + playerWidth)) ||
-            worldData.CheckForVoxelInSpace(new Vector3(Position.x - playerWidth, Position.y + 2f + upSpeed, Position.z + playerWidth)))
+        if (worldGenerator.CheckForVoxel(new Vector3Int((int)(Position.x - playerWidth), (int)(Position.y + 2f + upSpeed), (int)(Position.z - playerWidth))) ||
+            worldGenerator.CheckForVoxel(new Vector3Int((int)(Position.x + playerWidth), (int)(Position.y + 2f + upSpeed), (int)(Position.z - playerWidth))) ||
+            worldGenerator.CheckForVoxel(new Vector3Int((int)(Position.x + playerWidth), (int)(Position.y + 2f + upSpeed), (int)(Position.z + playerWidth))) ||
+            worldGenerator.CheckForVoxel(new Vector3Int((int)(Position.x - playerWidth), (int)(Position.y + 2f + upSpeed), (int)(Position.z + playerWidth))))
         {
             return 0;
         }
@@ -159,8 +232,8 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            if (worldData.CheckForVoxelInSpace(new Vector3(transform.position.x, transform.position.y, transform.position.z + playerWidth)) ||
-                worldData.CheckForVoxelInSpace(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z + playerWidth)))
+            if (worldGenerator.CheckForVoxel(new Vector3Int((int)transform.position.x, (int)transform.position.y, (int)(transform.position.z + playerWidth))) ||
+                worldGenerator.CheckForVoxel(new Vector3Int((int)transform.position.x, (int)(transform.position.y + 1f), (int)(transform.position.z + playerWidth))))
                 return true;
             else
                 return false;
@@ -173,8 +246,8 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            if (worldData.CheckForVoxelInSpace(new Vector3(transform.position.x, transform.position.y, transform.position.z - playerWidth)) || 
-                worldData.CheckForVoxelInSpace(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z - playerWidth)))
+            if (worldGenerator.CheckForVoxel(new Vector3Int((int)transform.position.x, (int)transform.position.y, (int)(transform.position.z - playerWidth))) ||
+                worldGenerator.CheckForVoxel(new Vector3Int((int)transform.position.x, (int)(transform.position.y + 1f), (int)(transform.position.z - playerWidth))))
                 return true;
             else
                 return false;
@@ -188,8 +261,8 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            if (worldData.CheckForVoxelInSpace(new Vector3(transform.position.x - playerWidth, transform.position.y, transform.position.z)) ||
-                worldData.CheckForVoxelInSpace(new Vector3(transform.position.x - playerWidth, transform.position.y + 1f, transform.position.z)))
+            if (worldGenerator.CheckForVoxel(new Vector3Int((int)(transform.position.x - playerWidth), (int)transform.position.y, (int)transform.position.z)) ||
+                worldGenerator.CheckForVoxel(new Vector3Int((int)(transform.position.x - playerWidth), (int)(transform.position.y + 1f), (int)transform.position.z)))
                 return true;
             else
                 return false;
@@ -203,8 +276,8 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            if (worldData.CheckForVoxelInSpace(new Vector3(transform.position.x + playerWidth, transform.position.y, transform.position.z)) ||
-                worldData.CheckForVoxelInSpace(new Vector3(transform.position.x + playerWidth, transform.position.y + 1f, transform.position.z)))
+            if (worldGenerator.CheckForVoxel(new Vector3Int((int)(transform.position.x + playerWidth), (int)transform.position.y, (int)transform.position.z)) ||
+                worldGenerator.CheckForVoxel(new Vector3Int((int)(transform.position.x + playerWidth), (int)(transform.position.y + 1f), (int)transform.position.z)))
                 return true;
             else
                 return false;

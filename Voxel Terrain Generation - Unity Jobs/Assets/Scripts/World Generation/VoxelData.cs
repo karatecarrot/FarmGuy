@@ -1,52 +1,37 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+using Unity.Mathematics;
+using Unity.Rendering;
 
 public static class VoxelData
 {
-    /// <summary>
-    /// <para>How many individual voxels are in the ChunkWidth</para>
-    /// MUST SET VALUE IN CODE! 
-    /// </summary> 
-    public static readonly int ChunkWidth = 16;
-    /// <summary>
-    /// <para>How many individual voxels are in the ChunkHeight</para> 
-    /// MUST SET VALUE IN CODE!
-    /// </summary> 
-	public static readonly int ChunkHeight = 128;
+    public static readonly int2 worldSizeInChunks = new int2(50, 50);
 
-    /// <summary>
-    /// How many chunks make up the world when generating.
-    /// </summary>
-    public static readonly int WorldSizeInChunks = 50;
+    public static readonly Vector3Int ChunkSize = new Vector3Int(16, 120, 16);
 
-    /// <summary>
-    /// How many voxels make up the world when generating.
-    /// </summary>
-    public static int WorldSizeInVoxels
-    {
-        get { return WorldSizeInChunks * ChunkWidth; }
-    }
-
-    /// <summary>
-    /// View distance for the player, if a chunk is further away then the ViewDistanceInChunks generation will not render.
-    /// </summary>
-    public static readonly int ViewDistanceInChunks = 5;
+    // Lighting
+    public static float minLightLevel = 0.15f;
+    public static float maxLightLevel = 0.9f;
+    public static float lightFalloff = 0.0f;
 
     /// <summary>
     /// How many voxel (block) textures are in the width and height of the atlas, E.G. 4 blocks in the width and height of the atlas.
     /// </summary>
     public static readonly int TextureAtlasSizeInBlocks = 4;
+
     /// <summary>
     /// Normalizes the texture atlas (0 to 1) then devides it by <seealso cref="TextureAtlasSizeInBlocks"/>
     /// <para>MUST BE SQUARE AND EVENLY SPACED TEXTURE ATLAS!</para>
     /// </summary>
-    public static float NormalizedBlockTextureSize
+    public static float NormalizesTextureSize
     {
         get { return 1f / TextureAtlasSizeInBlocks; }
     }
 
-	public static readonly Vector3[] voxelVerts = new Vector3[8] 
+    public static readonly Vector3[] voxelVerts = new Vector3[8] 
     {
 		new Vector3(0.0f, 0.0f, 0.0f),
 		new Vector3(1.0f, 0.0f, 0.0f),
@@ -58,14 +43,14 @@ public static class VoxelData
 		new Vector3(0.0f, 1.0f, 1.0f)
 	};
 
-	public static readonly Vector3[] faceChecks = new Vector3[6] 
+	public static readonly Vector3Int[] faceChecks = new Vector3Int[6] 
     {
-		new Vector3(0.0f, 0.0f, -1.0f),
-		new Vector3(0.0f, 0.0f, 1.0f),
-		new Vector3(0.0f, 1.0f, 0.0f),
-		new Vector3(0.0f, -1.0f, 0.0f),
-		new Vector3(-1.0f, 0.0f, 0.0f),
-		new Vector3(1.0f, 0.0f, 0.0f)
+		new Vector3Int( 0,  0, -1),
+		new Vector3Int( 0,  0,  1),
+		new Vector3Int( 0,  1,  0),
+		new Vector3Int( 0, -1,  0),
+		new Vector3Int(-1,  0,  0),
+		new Vector3Int( 1,  0,  0)
 	};
 
 	public static readonly int[,] voxelTris = new int[6,4] 
@@ -87,5 +72,29 @@ public static class VoxelData
 		new Vector2 (0.0f, 1.0f),
 		new Vector2 (1.0f, 0.0f),
 		new Vector2 (1.0f, 1.0f)
-	};    
+	};
+
+    public static float Get2DPerlin(Vector2 position, float offset, float scale)
+    {
+        return Mathf.PerlinNoise((position.x + 0.1f) / ChunkSize.x * scale + offset, (position.y + 0.1f) / ChunkSize.z * scale + offset);
+    }
+
+    public static bool Get3DPerlin(Vector3 position, float offset, float scale, float threshold)
+    {
+        float x = (position.x + offset + 0.1f) * scale;
+        float y = (position.y + offset + 0.1f) * scale;
+        float z = (position.z + offset + 0.1f) * scale;
+
+        float AB = Mathf.PerlinNoise(x, y);
+        float BC = Mathf.PerlinNoise(y, z);
+        float AC = Mathf.PerlinNoise(x, z);
+        float BA = Mathf.PerlinNoise(y, x);
+        float CB = Mathf.PerlinNoise(z, y);
+        float CA = Mathf.PerlinNoise(z, x);
+
+        if ((AB + BC + AC + BA + CB + CA) / 6f > threshold)
+            return true;
+        else
+            return false;
+    }
 }

@@ -5,15 +5,14 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BiomeAttribute", menuName = "New Biome")]
 public class BiomeAttributes : ScriptableObject
 {
+    [Header("Biome Data")]
     /// <summary>
     /// Name of the biome
     /// </summary>
     public string biomeName;
 
-    /// <summary>
-    /// Below <see cref="solidGroundHeight"/> is always solid ground.
-    /// </summary>
-    public int solidGroundHeight;
+    public int offset;
+    public float scale;
 
     /// <summary>
     /// Height of the terrain, starting from the <see cref="solidGroundHeight"/> to the heighest point the terrain will generate
@@ -25,6 +24,11 @@ public class BiomeAttributes : ScriptableObject
     /// </summary>
     public float terrainScale;
 
+    public byte surfaceBlockID;
+    public byte subSurfaceBlockID;
+
+    [Space]
+    [Header("Cave and Ore Data")]
     public Lode[] lodes;
 
 }
