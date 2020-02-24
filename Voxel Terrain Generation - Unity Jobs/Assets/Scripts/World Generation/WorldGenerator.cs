@@ -49,7 +49,9 @@ public class WorldGenerator : MonoBehaviour
 
     private void Start()
     {
-        new System.Random(GameManager.settings.seed);
+        Debug.Log("Generating new world using seed " + VoxelData.seed);
+
+        UnityEngine.Random.InitState(VoxelData.seed);
 
         if (GameManager.settings.enableThreading)
         {
@@ -422,11 +424,9 @@ public class Settings
     /// </summary>
     public int ViewDistanceInChunks = 3;
     public bool enableThreading = true;
+    public bool enableChunkAnimation = false;
     public float chunkAnimationSpeed = 50;
 
     [Header("Controls")]
     [Range(1, 10)] public float mouseSensitivity = 2;
-
-    [Header("World Generation")]
-    public int seed;
 }

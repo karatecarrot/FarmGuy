@@ -12,6 +12,8 @@ public static class VoxelData
 
     public static readonly Vector3Int ChunkSize = new Vector3Int(16, 120, 16);
 
+    public static int seed;
+
     // Lighting
     public static float minLightLevel = 0.15f;
     public static float maxLightLevel = 0.9f;
@@ -76,14 +78,17 @@ public static class VoxelData
 
     public static float Get2DPerlin(Vector2 position, float offset, float scale)
     {
-        return Mathf.PerlinNoise((position.x + 0.1f) / ChunkSize.x * scale + offset, (position.y + 0.1f) / ChunkSize.z * scale + offset);
+        position.x += (offset + seed + 0.1f);
+        position.y += (offset + seed + 0.1f);
+
+        return Mathf.PerlinNoise(position.x / ChunkSize.x * scale, position.y / ChunkSize.z * scale);
     }
 
     public static bool Get3DPerlin(Vector3 position, float offset, float scale, float threshold)
     {
-        float x = (position.x + offset + 0.1f) * scale;
-        float y = (position.y + offset + 0.1f) * scale;
-        float z = (position.z + offset + 0.1f) * scale;
+        float x = (position.x + offset + seed + 0.1f) * scale;
+        float y = (position.y + offset + seed + 0.1f) * scale;
+        float z = (position.z + offset + seed + 0.1f) * scale;
 
         float AB = Mathf.PerlinNoise(x, y);
         float BC = Mathf.PerlinNoise(y, z);

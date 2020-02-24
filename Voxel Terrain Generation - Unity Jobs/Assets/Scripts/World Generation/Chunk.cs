@@ -379,7 +379,7 @@ public class Chunk
     {
         EntityArchetype archetype;
 
-        if (gameManager.settings.chunkAnimationSpeed == 0)
+        if (!gameManager.settings.enableChunkAnimation)
         {
            archetype = entityManager.CreateArchetype(
            typeof(Translation),
