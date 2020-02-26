@@ -1,4 +1,4 @@
-id: -1
+id: 0
 name: Empty
 stackable: false
 solid: false
@@ -11,96 +11,96 @@ bottom: -1
 left: -1
 right: -1
 ,
-id: 0
-name: Grass
-stackable: true
-solid: true
-renderFaces: false
-transparency: 0
-back: 2
-front: 2
-top: 7
-bottom: 1
-left: 2
-right: 2
-,
 id: 1
-name: Dirt
-stackable: true
-solid: true
-renderFaces: false
-transparency: 0
-back: 1
-front: 1
-top: 1
-bottom: 1
-left: 1
-right: 1
-,
-id: 2
-name: Stone
+name: Plain Grass
 stackable: true
 solid: true
 renderFaces: false
 transparency: 0
 back: 0
 front: 0
-top: 0
-bottom: 0
+top: 1
+bottom: 2
 left: 0
 right: 0
 ,
+id: 2
+name: Snowy Grass
+stackable: true
+solid: true
+renderFaces: false
+transparency: 0
+back: 3
+front: 3
+top: 4
+bottom: 5
+left: 3
+right: 3
+,
 id: 3
+name: Dead Grass
+stackable: true
+solid: true
+renderFaces: false
+transparency: 0
+back: 6
+front: 6
+top: 7
+bottom: 8
+left: 6
+right: 6
+,
+id: 4
+name: Dirt
+stackable: true
+solid: true
+renderFaces: false
+transparency: 0
+back: 2
+front: 2
+top: 2
+bottom: 2
+left: 2
+right: 2
+,
+id: 5
+name: Stone
+stackable: true
+solid: true
+renderFaces: false
+transparency: 0
+back: 12
+front: 12
+top: 12
+bottom: 12
+left: 12
+right: 12
+,
+id: 6
 name: Bedrock
 stackable: false
 solid: true
 renderFaces: false
 transparency: 0
-back: 9
-front: 9
-top: 9
-bottom: 9
-left: 9
-right: 9
+back: 13
+front: 13
+top: 13
+bottom: 13
+left: 13
+right: 13
 ,
-id: 4
-name: Wood Logs
-stackable: true
-solid: true
-renderFaces: false
-transparency: 0
-back: 5
-front: 5
-top: 6
-bottom: 6
-left: 5
-right: 5
-,
-id: 5
-name: Glass
-stackable: true
-solid: true
-renderFaces: true
-transparency: 1
-back: 3
-front: 3
-top: 3
-bottom: 3
-left: 3
-right: 3
-,
-id: 6
+id: 7
 name: Sand
 stackable: true
 solid: true
 renderFaces: false
 transparency: 0
-back: 10
-front: 10
+back: 9
+front: 9
 top: 10
-bottom: 10
-left: 10
-right: 10
+bottom: 11
+left: 9
+right: 9
 ;
 
 

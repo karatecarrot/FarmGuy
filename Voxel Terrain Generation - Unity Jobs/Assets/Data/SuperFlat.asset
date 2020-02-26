@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: SuperFlat
   m_EditorClassIdentifier: 
   biomeName: Super Flat
-  solidGroundHeight: 5
+  offset: 0
+  scale: 0
   terrainHeight: 5
   terrainScale: 0
   surfaceBlockID: 1
-  subSurfaceBlockID: 3
+  subSurfaceBlockID: 4
   lodes: []
