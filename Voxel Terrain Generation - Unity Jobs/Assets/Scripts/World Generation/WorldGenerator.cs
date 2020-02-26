@@ -324,7 +324,7 @@ public class WorldGenerator : MonoBehaviour
 
         // If bottom block of chunk, return bedrock voxel ID
         if (yPos == 0)
-            return 4;
+            return 6;
 
         /* BIOME SELECTION */
 
@@ -380,9 +380,9 @@ public class WorldGenerator : MonoBehaviour
         else if (yPos > terrainHeight)
             return 0;
         else
-            voxelValue = 3;
+            voxelValue = 5;
 
-        if (voxelValue == 2 || voxelValue == 3 || voxelValue == 1)
+        if ((voxelValue == biome.surfaceBlockID || voxelValue == biome.surfaceBlockID || voxelValue == 5) && biome.lodes.Length > 0)
         {
             foreach (Lode lode in biome.lodes)
             {

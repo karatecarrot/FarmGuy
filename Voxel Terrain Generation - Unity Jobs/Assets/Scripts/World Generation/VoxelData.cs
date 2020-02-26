@@ -8,7 +8,7 @@ using Unity.Rendering;
 
 public static class VoxelData
 {
-    public static readonly int2 worldSizeInChunks = new int2(50, 50);
+    public static readonly int2 worldSizeInChunks = new int2(10, 10);
 
     public static readonly Vector3Int ChunkSize = new Vector3Int(16, 120, 16);
 
@@ -22,7 +22,7 @@ public static class VoxelData
     /// <summary>
     /// How many voxel (block) textures are in the width and height of the atlas, E.G. 4 blocks in the width and height of the atlas.
     /// </summary>
-    public static readonly int TextureAtlasSizeInBlocks = 4;
+    public static readonly int TextureAtlasSizeInBlocks = 16;
 
     /// <summary>
     /// Normalizes the texture atlas (0 to 1) then devides it by <seealso cref="TextureAtlasSizeInBlocks"/>

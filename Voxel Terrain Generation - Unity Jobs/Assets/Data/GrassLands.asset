@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   biomeName: Grass Lands
   offset: 1234
-  scale: 0.042
+  scale: 0.68
   terrainHeight: 80
   terrainScale: 0.15
-  surfaceBlockID: 1
-  subSurfaceBlockID: 3
+  surfaceBlockID: 3
+  subSurfaceBlockID: 4
   lodes: []

@@ -18,5 +18,5 @@ MonoBehaviour:
   terrainHeight: 80
   terrainScale: 0.3
   surfaceBlockID: 1
-  subSurfaceBlockID: 3
+  subSurfaceBlockID: 4
   lodes: []
